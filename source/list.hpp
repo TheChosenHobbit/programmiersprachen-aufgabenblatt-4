@@ -1,7 +1,7 @@
 #ifndef BUW_LIST_HPP
 #define BUW_LIST_HPP
 #include <cstddef>
-
+#include <iostream>
 //List.hpp
 
 template <typename T>
@@ -42,12 +42,30 @@ struct ListIterator
 
 	ListIterator() : m_node(nullptr) {}
 	ListIterator(ListNode<T>* n) : m_node(n) {}
-	reference operator*() const {}
-	pointer operator->() const {}
-	Self& operator++() {}
-	Self operator++(int) {}
-	bool operator==(const Self& x) const {}
-	bool operator!=(const Self& x) const {}
+	reference operator*() const {
+		return m_node->m_value;
+	}
+	pointer operator->() const {
+		return *m_node;
+	}
+	Self& operator++() {
+		*this = next();
+		return *this;
+	}
+	Self operator++(int count) {
+		while (count != 0)
+		{
+			*this = next();
+			--count;
+		}
+		return *this;
+	}
+	bool operator==(const Self& x) const {
+		return m_node == x.m_node;
+	}
+	bool operator!=(const Self& x) const {
+		return m_node != x.m_node;
+	}
 	Self next() const
 	{
 		if(m_node)
@@ -55,6 +73,9 @@ struct ListIterator
 		else
 			return ListIterator(nullptr);
 	}
+	//für insert
+	ListNode<T>* getNode() const { return m_node; };
+
 private:
 // The  Node  the  iterator  is  pointing  to
 	ListNode<T>* m_node = nullptr;
@@ -168,10 +189,89 @@ public:
 		}
 	}
 
+	~List(){
+		clear();
+	}
+
+//Aufgabe 5
+	iterator begin() const{
+		return iterator(m_first);
+	}
+
+	iterator end() const{
+		return iterator(m_last);
+	}
+
+//Aufgabe 7
+	List(List const& copy) : m_size(0), m_first(nullptr), m_last(nullptr){
+		for(ListIterator<T> ListIter = copy.begin(); ListIter != copy.end(); ++ListIter)
+		{
+			push_back(*ListIter);
+		}
+	}
+
+//Aufgabe 8
+	/*
+	void insert(iterator const& iter, T const& value)
+	{
+		ListNode<T> insert = new ListNode<T> (value, nullptr, nullptr);
+		ListNode<T> prev = iter.getNode()->m_prev;
+		ListNode<T> next = iter.getNode();
+
+		insert->m_prev = m_prev;
+		prev->m_next = insert;
+		insert->m_next = next;
+		next->m_prev = insert;
+	}*/
+
+		void insert(iterator const& iter, T const& value){
+				ListNode<T>* insertNode = new ListNode<T>(value, nullptr, nullptr);	//new node
+				ListNode<T>* prev = iter.getNode()->m_prev;
+				ListNode<T>* next = iter.getNode();
+				insertNode->m_prev = prev; //insert new node and change m_prev and m_next
+				prev->m_next = insertNode;
+				insertNode->m_next = next;
+				next->m_prev = insertNode;
+			}
+
 private:
 	std::size_t m_size = 0;
 	ListNode<T>* m_first = nullptr;
 	ListNode<T>* m_last = nullptr;
 };
+
+//Aufgabe 6
+template<typename T>
+bool operator==(List<T> const& xs, List<T> const& ys)
+{
+	ListIterator<T> yIter = ys.begin();
+	bool check = true;
+	for(ListIterator<T> xIter = xs.begin(); xIter != xs.end(); ++xIter)
+	{
+		if(*xIter != *yIter)
+		{
+			check = false;
+			break;
+		}
+		++yIter;
+	}
+	return check;
+}
+
+template<typename T>
+bool operator!=(List<T> const& xs, List<T> const& ys)
+{
+	ListIterator<T> yIter = ys.begin();
+	bool check = false;
+	for(ListIterator<T> xIter = xs.begin(); xIter != xs.end(); ++xIter)
+	{
+		if(*xIter == *yIter)
+		{
+			check = true;
+		}
+		++yIter;
+	}
+	return check;
+}
 
 #endif // #define BUW_LIST_HPP
