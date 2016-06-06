@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
 #include "list.hpp"
+#include <iostream>
 
 TEST_CASE ("List Empty Test","[List]"){
 	List<int> l1;
@@ -112,6 +113,67 @@ TEST_CASE("Insert of an element","[Insert]"){
 	REQUIRE(4 == *list.begin());
 
 }
+
+TEST_CASE("Reverse a list intern","[Reverse]"){
+	List<int> list;
+	list.push_front(1);
+	list.push_front(2);
+	list.push_front(3);
+	list.push_front(4);
+	list.reverse();
+
+	REQUIRE(1 == *list.begin());
+	list.pop_front();
+	REQUIRE(2 == *list.begin());
+	list.pop_front();
+	REQUIRE(3 == *list.begin());
+	list.pop_front();
+	REQUIRE(4 == *list.begin());
+	list.pop_front();
+	list.reverse();
+}
+
+TEST_CASE("Reverse a list extern","[Reverse]"){
+	List<int> list;
+	list.push_front(1);
+	list.push_front(1);
+	list.push_front(2);
+	list.push_front(3);
+	list.push_front(4);
+
+	List<int> list2 = reverse(list);
+
+/*
+	for(auto iter = list.begin(); iter != list.end(); ++iter){
+		std::cout << *iter << std::endl;
+	}
+	
+	for(auto iter = list2.begin(); iter != list2.end(); ++iter){
+		std::cout << *iter << std::endl;
+	}
+*/
+
+	REQUIRE(1 == *list2.begin());
+	list2.pop_front();
+	REQUIRE(2 == *list2.begin());
+	list2.pop_front();
+	REQUIRE(3 == *list2.begin());
+	list2.pop_front();
+	REQUIRE(4 == *list2.begin());
+}
+
+TEST_CASE("move constructor","[constructor]"){
+	List < int > list ;
+	list . push_front (1);
+	list . push_front (2);
+	list . push_front (3);
+	list . push_front (4);
+	List < int > list2 ( std :: move ( list ));
+	REQUIRE (0 == list . size ());
+	REQUIRE ( list . empty ());
+	REQUIRE (4 == list2 . size ());
+}
+
 
 int main(int argc, char *argv[])
 {

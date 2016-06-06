@@ -211,28 +211,54 @@ public:
 	}
 
 //Aufgabe 8
-	/*
-	void insert(iterator const& iter, T const& value)
-	{
-		ListNode<T> insert = new ListNode<T> (value, nullptr, nullptr);
-		ListNode<T> prev = iter.getNode()->m_prev;
-		ListNode<T> next = iter.getNode();
+	void insert(iterator const& iter, T const& value){
+		//Neuen Node erstellt und Zeiger auf prev und "next"
+		ListNode<T>* insertNode = new ListNode<T>(value, nullptr, nullptr);
+		ListNode<T>* prevNode = iter.getNode()->m_prev;
+		ListNode<T>* nextNode = iter.getNode();
 
-		insert->m_prev = m_prev;
-		prev->m_next = insert;
-		insert->m_next = next;
-		next->m_prev = insert;
-	}*/
+		//Zeiger auf Nodes richtig zuweisen
+		insertNode->m_prev = prevNode;
+		prevNode->m_next = insertNode;
+		insertNode->m_next = nextNode;
+		nextNode->m_prev = insertNode;
+	}
 
-		void insert(iterator const& iter, T const& value){
-				ListNode<T>* insertNode = new ListNode<T>(value, nullptr, nullptr);	//new node
-				ListNode<T>* prev = iter.getNode()->m_prev;
-				ListNode<T>* next = iter.getNode();
-				insertNode->m_prev = prev; //insert new node and change m_prev and m_next
-				prev->m_next = insertNode;
-				insertNode->m_next = next;
-				next->m_prev = insertNode;
-			}
+//Aufgabe 9
+	void reverse(){
+		if(empty())
+			return;
+
+		auto rememberNode = m_first;
+		m_first = m_last;
+		m_last = rememberNode;
+
+
+		for (ListIterator<T> iter = begin(); iter != end(); ++iter)
+		{
+			auto node = iter.getNode();
+			auto remember = node -> m_prev;
+			node->m_prev  = node->m_next;
+			node->m_next = remember;
+		}
+	}
+
+
+//Aufgabe 12
+	List<T> (List<T>&& rhs) : m_size(rhs.m_size), m_first(rhs.m_first), m_last(rhs.m_last) {
+		rhs.m_size = 0;
+		rhs.m_first = nullptr;
+		rhs.m_last = nullptr;
+	}
+
+	List<T>& operator = (List<T>&& list){
+		std::swap(m_size, list.m_size);
+		std::swap(m_first, list.m_first);
+		std::swap(m_last, list.m_last);
+
+	return *this;
+	}
+
 
 private:
 	std::size_t m_size = 0;
@@ -272,6 +298,17 @@ bool operator!=(List<T> const& xs, List<T> const& ys)
 		++yIter;
 	}
 	return check;
+}
+
+//Aufgabe 9
+template<typename T>
+List<T> reverse(List<T> const& liste1){
+	List<T> liste2;
+	for(ListIterator<T> iter = liste1.begin(); iter != liste1.end(); ++iter)
+	{
+		liste2.push_front(*iter);
+	}
+	return liste2;
 }
 
 #endif // #define BUW_LIST_HPP
